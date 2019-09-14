@@ -1,5 +1,5 @@
 {
-  "name": "javascript-template-action",
+  "name": "manage-issue-subscribers",
   "version": "0.0.0",
   "private": true,
   "description": "JavaScript template action",
@@ -8,16 +8,13 @@
     "build": "tsc",
     "test": "jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/javascript-template.git"
-  },
+  "repository": "https://github.com/zpao/manage-issue-subscribers",
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "Paul O’Shannessy <paul@oshannessy.com>",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.0.0"
