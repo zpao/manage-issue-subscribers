@@ -10,8 +10,9 @@ jobs:
     - name: "npm ci"
       run: npm ci
 
-    - name: "npm run build"
-      run: npm run build
+    - name: "npm run dist"
+      # Dist does tsc & ncc, so will actually trigger the uncommitted changes check
+      run: npm run dist
 
     - name: "npm run test"
       run: npm run test
