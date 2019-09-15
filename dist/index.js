@@ -3201,6 +3201,7 @@ const LABEL_TO_USERS_MAP = {
 };
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log(JSON.stringify(github.context, null, 2));
         try {
             const repoToken = core.getInput('repo-token', { required: true });
             const issue = github.context.issue;

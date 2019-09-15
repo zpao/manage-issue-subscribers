@@ -7,6 +7,7 @@ const LABEL_TO_USERS_MAP: { [key: string]: string[] } = {
 };
 
 async function main() {
+  console.log(JSON.stringify(github.context, null, 2));
   try {
     const repoToken: string = core.getInput('repo-token', { required: true });
     const issue: { owner: string; repo: string; number: number } =
