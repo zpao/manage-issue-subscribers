@@ -10,6 +10,9 @@ const LABEL_TO_USERS_MAP: { [key: string]: string[] } = {
   documentation: ['@zpao', '@zpao-test']
 };
 
+// Not ideal but we can't get this via API.
+const BOT_ID = 41898282;
+
 async function main() {
   console.log(JSON.stringify(github.context, null, 2));
   try {
@@ -18,12 +21,6 @@ async function main() {
       github.context.issue;
 
     const client = new github.GitHub(repoToken);
-
-    // Types on this are any, so we'll just make it what we want :/
-    const {
-      data: bot
-    }: Octokit.Response<BasicUserInfo> = await client.users.getAuthenticated();
-    console.log(bot);
 
     // TODO: can we just get the labels from the context?
     const { data: labels } = await client.issues.listLabelsOnIssue({
@@ -49,7 +46,7 @@ async function main() {
       })
     );
 
-    const botComment = comments.find(comment => comment.user.id === bot.id);
+    const botComment = comments.find(comment => comment.user.id === BOT_ID);
 
     const commentBody = `cc ${Array.from(mentionees).join(', ')}`;
 

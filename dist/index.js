@@ -3200,6 +3200,8 @@ const LABEL_TO_USERS_MAP = {
     duplicate: ['@zpao'],
     documentation: ['@zpao', '@zpao-test']
 };
+// Not ideal but we can't get this via API.
+const BOT_ID = 41898282;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(JSON.stringify(github.context, null, 2));
@@ -3207,9 +3209,6 @@ function main() {
             const repoToken = core.getInput('repo-token', { required: true });
             const issue = github.context.issue;
             const client = new github.GitHub(repoToken);
-            // Types on this are any, so we'll just make it what we want :/
-            const { data: bot } = yield client.users.getAuthenticated();
-            console.log(bot);
             // TODO: can we just get the labels from the context?
             const { data: labels } = yield client.issues.listLabelsOnIssue({
                 owner: issue.owner,
@@ -3229,7 +3228,7 @@ function main() {
                 number: issue.number,
                 per_page: 100
             }));
-            const botComment = comments.find(comment => comment.user.id === bot.id);
+            const botComment = comments.find(comment => comment.user.id === BOT_ID);
             const commentBody = `cc ${Array.from(mentionees).join(', ')}`;
             if (botComment === undefined) {
                 yield client.issues.createComment({
