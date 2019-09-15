@@ -3202,28 +3202,30 @@ const LABEL_TO_USERS_MAP = {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const repoToken = core.getInput('repo-token', { required: true });
-            const issue = github.context.issue;
-            const client = new github.GitHub(repoToken);
-            // TODO: can we just get the labels from the context?
-            const { data: labels } = yield client.issues.listLabelsOnIssue({
-                owner: issue.owner,
-                repo: issue.repo,
-                issue_number: issue.number
-            });
-            let mentionees = [];
-            labels.forEach(label => {
-                const users = LABEL_TO_USERS_MAP[label.name];
-                if (users != null) {
-                    mentionees = mentionees.concat(users);
-                }
-            });
-            yield client.issues.createComment({
-                owner: issue.owner,
-                repo: issue.repo,
-                issue_number: issue.number,
-                body: `cc ${mentionees.join(', ')}`
-            });
+            // const repoToken: string = core.getInput('repo-token', { required: true });
+            // const issue: { owner: string; repo: string; number: number } =
+            //   github.context.issue;
+            core.debug(JSON.stringify(github.context, null, 2));
+            // const client = new github.GitHub(repoToken);
+            // // TODO: can we just get the labels from the context?
+            // const { data: labels } = await client.issues.listLabelsOnIssue({
+            //   owner: issue.owner,
+            //   repo: issue.repo,
+            //   issue_number: issue.number
+            // });
+            // let mentionees: string[] = [];
+            // labels.forEach(label => {
+            //   const users = LABEL_TO_USERS_MAP[label.name];
+            //   if (users != null) {
+            //     mentionees = mentionees.concat(users);
+            //   }
+            // });
+            // await client.issues.createComment({
+            //   owner: issue.owner,
+            //   repo: issue.repo,
+            //   issue_number: issue.number,
+            //   body: `cc ${mentionees.join(', ')}`
+            // });
         }
         catch (error) {
             core.setFailed(error.message);

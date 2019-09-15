@@ -1,11 +1,11 @@
 name: 'Manage Issue Subscribers'
 description: 'Automatically CC people based on labels.'
 author: '@zpao'
-inputs:
-  repo-token: # change this
-    description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
-    required: true
-    # default: 'default value if applicable'
+# inputs:
+#   repo-token: # change this
+#     description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
+#     required: true
+#     # default: 'default value if applicable'
 runs:
   using: 'node12'
   main: 'dist/index.js'
