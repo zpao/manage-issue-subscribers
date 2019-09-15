@@ -1,5 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import * as Octokit from '@octokit/rest';
+
+type BasicUserInfo = { login: string; id: number };
 
 const LABEL_TO_USERS_MAP: { [key: string]: string[] } = {
   bug: ['@zpao-test'],
@@ -15,6 +18,13 @@ async function main() {
       github.context.issue;
 
     const client = new github.GitHub(repoToken);
+
+    // Types on this are any, so we'll just make it what we want :/
+    const {
+      data: bot
+    }: Octokit.Response<BasicUserInfo> = await client.users.getAuthenticated();
+    console.log(bot);
+
     // TODO: can we just get the labels from the context?
     const { data: labels } = await client.issues.listLabelsOnIssue({
       owner: issue.owner,
@@ -30,12 +40,34 @@ async function main() {
       }
     });
 
-    await client.issues.createComment({
-      owner: issue.owner,
-      repo: issue.repo,
-      issue_number: issue.number,
-      body: `cc ${Array.from(mentionees).join(', ')}`
-    });
+    const comments: Octokit.IssuesListCommentsResponseItem[] = await client.paginate(
+      client.issues.listComments.endpoint.merge({
+        owner: issue.owner,
+        repo: issue.repo,
+        number: issue.number,
+        per_page: 100
+      })
+    );
+
+    const botComment = comments.find(comment => comment.user.id === bot.id);
+
+    const commentBody = `cc ${Array.from(mentionees).join(', ')}`;
+
+    if (botComment === undefined) {
+      await client.issues.createComment({
+        owner: issue.owner,
+        repo: issue.repo,
+        issue_number: issue.number,
+        body: commentBody
+      });
+    } else {
+      await client.issues.updateComment({
+        owner: issue.owner,
+        repo: issue.repo,
+        comment_id: botComment.id,
+        body: commentBody
+      });
+    }
   } catch (error) {
     core.setFailed(error.message);
   }

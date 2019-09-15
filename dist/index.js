@@ -3197,7 +3197,8 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const LABEL_TO_USERS_MAP = {
     bug: ['@zpao-test'],
-    duplicate: ['@zpao']
+    duplicate: ['@zpao'],
+    documentation: ['@zpao', '@zpao-test']
 };
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -3206,25 +3207,46 @@ function main() {
             const repoToken = core.getInput('repo-token', { required: true });
             const issue = github.context.issue;
             const client = new github.GitHub(repoToken);
+            // Types on this are any, so we'll just make it what we want :/
+            const { data: bot } = yield client.users.getAuthenticated();
+            console.log(bot);
             // TODO: can we just get the labels from the context?
             const { data: labels } = yield client.issues.listLabelsOnIssue({
                 owner: issue.owner,
                 repo: issue.repo,
                 issue_number: issue.number
             });
-            let mentionees = [];
+            let mentionees = new Set();
             labels.forEach(label => {
                 const users = LABEL_TO_USERS_MAP[label.name];
                 if (users != null) {
-                    mentionees = mentionees.concat(users);
+                    users.forEach(u => mentionees.add(u));
                 }
             });
-            yield client.issues.createComment({
+            const comments = yield client.paginate(client.issues.listComments.endpoint.merge({
                 owner: issue.owner,
                 repo: issue.repo,
-                issue_number: issue.number,
-                body: `cc ${mentionees.join(', ')}`
-            });
+                number: issue.number,
+                per_page: 100
+            }));
+            const botComment = comments.find(comment => comment.user.id === bot.id);
+            const commentBody = `cc ${Array.from(mentionees).join(', ')}`;
+            if (botComment === undefined) {
+                yield client.issues.createComment({
+                    owner: issue.owner,
+                    repo: issue.repo,
+                    issue_number: issue.number,
+                    body: commentBody
+                });
+            }
+            else {
+                yield client.issues.updateComment({
+                    owner: issue.owner,
+                    repo: issue.repo,
+                    comment_id: botComment.id,
+                    body: commentBody
+                });
+            }
         }
         catch (error) {
             core.setFailed(error.message);
